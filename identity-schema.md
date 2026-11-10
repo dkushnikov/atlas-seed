@@ -8,9 +8,15 @@
 
 ---
 
+## Two kinds of file, and what loads
+
+Seven of the eight files **describe the person**: principles, roles, capitals, compass, summary, psychometrics, complementarity. One file **prescribes the AI's behaviour**: `working-style.md`. The short route of the README produces a smaller version of that one file, `working-rules.md`, before any description exists. The description justifies the rules; the AI acts on the rules. When the two disagree, fix the rules, not the AI.
+
+Nothing in this schema loads by itself. What loads at the start of a session is the environment's instruction surface (custom instructions, `AGENTS.md`, `CLAUDE.md`); it names `working-rules.md` and, on the full route, `me-summary.md`. The other files are read when the work needs them. Details per environment: [environments.md](environments.md); the loading contract: [walk-up-chain.md](walk-up-chain.md).
+
 ## Overview
 
-Atlas Seed's identity layer is eight markdown files with frontmatter, living in `core/identity/` in your environment. Each file covers one dimension of identity:
+Atlas Seed's identity layer is eight markdown files with frontmatter, living in a folder your instruction file points to: `identity/` in the templates, `core/identity/` in the author's setup. Each file covers one dimension of identity:
 
 | File | Dimension | Stability |
 |------|-----------|-----------|
@@ -23,7 +29,7 @@ Atlas Seed's identity layer is eight markdown files with frontmatter, living in 
 | `working-style.md` | How you work with AI | Medium (evolves with use) |
 | `complementarity.md` | Where you and AI complement | Lower (draft status, actively evolving) |
 
-**Why 8 files, not 1:** separation of concerns. Soul changes rarely; working-style changes often. Packing both into one file means re-validating the whole thing every time you touch the faster-evolving parts. Separation also supports the walk-up chain — Claude can load just `me-summary.md` for fast sessions and only reach for deeper files when work requires.
+**Why 8 files, not 1:** separation of concerns. Soul changes rarely; working-style changes often. Packing both into one file means re-validating the whole thing every time you touch the faster-evolving parts. Separation also keeps session starts cheap: the instruction file names `me-summary.md`, and the agent reads the deeper files only when the work requires them.
 
 **Why 8 files, not 15:** diminishing returns. More files means more maintenance overhead, more frontmatter to keep current, more integrity checks, more decisions about "where does this go?". Eight is the size that captured the useful dimensions in the reference implementation without creating documentation debt. You can extend if you need to — the schema is not closed. But start with eight.
 
@@ -209,7 +215,7 @@ This schema deviates from personal-context's `last_updated` / `source_refs` nami
 - Values: 5-12. List them, don't over-explain. The explanation comes from how they interact with decisions.
 - Principles: accumulated heuristics you've derived from experience. "Time is the only non-renewable resource" is a principle. "Measure twice, cut once" is a principle. Don't aim for completeness; aim for the ones you actually reach for.
 - Point to canonical long version if you have one.
-- This file is the *decision-support reference* — when Claude is helping you weigh options, it consults this file.
+- This file is the *decision-support reference* — when the assistant is helping you weigh options, it consults this file.
 
 ### 5. me-summary.md — Compact self-portrait
 
@@ -300,7 +306,7 @@ Full version: [pointer to canonical long doc if exists]
 ```
 
 **Content guidance:**
-- This file is *extracted*, not *declared*. It comes from observing what works over dozens of sessions. Day 1, it's a placeholder. Month 1, it's a real document.
+- This file is *extracted*, not *declared*. It comes from observing what works over dozens of sessions. Day 1, it is `working-rules.md` from the short route (5–7 rules and a corrections log). Month 1, it's a real document. Keep `working-rules.md` as the operational short file the instruction surface loads; this one is its long form.
 - Include concrete preferences: language (English only? Russian? code-switch naturally?), tone (formal, casual, ironic?), push-back style (blunt or diplomatic?).
 - Include honest AI limitations: "I sometimes confuse people in transcripts," "I misinterpret garbled text as fact," "I don't have body state." These are protection clauses against Claude over-claiming.
 - Include what works: challenge > agreement, protocol > improvisation, cross-domain synthesis > domain-only analysis.
@@ -381,7 +387,7 @@ The schema is versioned. This is v0.1 alpha.
 
 ## Schema validation
 
-**v0.1 alpha has no validation tooling.** You write files, you read them, Claude reads them. If they're malformed, you notice at next session when Claude's behavior is off.
+**v0.1 alpha has no validation tooling.** You write files, you read them, the assistant reads them. If they're malformed, you notice at the next session when the assistant's behaviour is off. The one observable check is the marker line the template `AGENTS.md` asks for (`rules vN loaded`): it tells you the instruction file was read, nothing more.
 
 **v0.2+ planned:** a lightweight validator — a script that reads your identity files, checks frontmatter schema, confirms section headers are present, flags stale `updated` dates, and reports issues. Not enforcement, advisory.
 

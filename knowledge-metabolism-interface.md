@@ -18,7 +18,7 @@ This document defines the **interface contract**: what Atlas Seed guarantees to 
 
 ## Relationship to the research
 
-The Knowledge Metabolism research project (see the Knowledge Metabolism research project (separate repository, forthcoming)) contains:
+The Knowledge Metabolism research project (a separate project of the author, not yet published) contains:
 
 - The full biological metabolism metaphor (ingestion → digestion → absorption → metabolism → circulation → elimination)
 - Mapping to ~10 existing knowledge management frameworks (SECI, CODE, GTD, Boundary Objects, Double-Loop Learning, Cynefin, DIKW, Kepinski's Information Metabolism, etc.)
@@ -29,6 +29,8 @@ The Knowledge Metabolism research project (see the Knowledge Metabolism research
 **Atlas Seed does not redefine or compete with that research.** It provides one piece: the identity-side input that personalizes processing.
 
 The relationship in one line: **Knowledge Metabolism is the cycle; Atlas Seed's identity layer is one of its inputs.**
+
+**Scope note (2026-11-10).** Atlas Seed supports three ways of running: ChatGPT (files you keep and paste), Codex and Claude Code (a folder with `AGENTS.md`). A KM system is an *extension* on top of the folder case: it reads files from a folder the user names. Nothing in this repository installs, connects or runs one. The ChatGPT route has no folder and therefore no KM consumer; the user pastes what a tool should know.
 
 ## What the identity layer exposes
 
@@ -80,7 +82,7 @@ Any KM implementation consuming Atlas Seed's identity layer can assume:
 
 ### A1: Files exist at stable paths
 
-The eight identity files live at predictable paths (default: `core/identity/<file>.md` in the user's environment root). KM systems can resolve paths through the walk-up chain or through direct configuration.
+The eight identity files live at predictable paths: the folder the user's instruction file (`AGENTS.md`, `CLAUDE.md`) names, `identity/<file>.md` in the templates and `core/identity/<file>.md` in the author's setup. A KM system takes the folder from its own configuration or from that instruction file; it does not guess.
 
 ### A2: Frontmatter schema is consistent
 
@@ -94,9 +96,9 @@ Each file has a documented section schema (see `identity-schema.md`). KM systems
 
 When the user refines an identity file, the `updated` frontmatter field changes. KM systems caching identity can detect staleness and reload.
 
-### A5: Privacy boundaries are respected by the substrate
+### A5: Privacy boundaries are a policy the user states and a mechanism the environment may or may not provide
 
-If the KM system is running in a bounded context that should not read identity (e.g., Sanctum), the substrate prevents access. The KM system does not need to enforce this — it's the substrate's responsibility per `walk-up-chain.md` R7.
+The user decides where identity may be read (`walk-up-chain.md` § Privacy boundaries). Where the environment has an enforcement mechanism (Codex permission profiles, Claude Code deny rules, a folder the agent cannot reach), that mechanism is what prevents access. Where it has none, nothing does. A KM system must therefore: read only the folder it was pointed at; treat a stated policy ("do not read identity in this context") as binding on itself; and never present "the substrate prevents it" as a guarantee to the user. Atlas Seed states requirements here; it ships no enforcement.
 
 ## What KM systems should NOT assume
 
@@ -207,7 +209,7 @@ If you're building a KM system that wants to support Atlas Seed identity:
 - [ ] Parse markdown sections per `identity-schema.md` schemas
 - [ ] Degrade gracefully when files are missing (especially `psychometrics-summary.md`)
 - [ ] Cache identity for efficiency (identity changes slowly, don't re-read per request)
-- [ ] Respect substrate privacy boundaries (if bounded context excludes identity, skip)
+- [ ] Respect the user's stated privacy policy yourself (if a context excludes identity, skip; do not rely on the environment to stop you)
 - [ ] Treat identity as read-only (never propose writes from KM system; writes go through user's iterate-from-use ritual)
 - [ ] Version your identity cache against schema v0.1 so upgrades can invalidate correctly
 - [ ] Document your KM system's use of identity in your own README so users know what's consumed

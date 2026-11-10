@@ -1,172 +1,119 @@
 # Atlas Seed
 
-**An identity layer for personal AI. Not a vault, not a tool, not a methodology — a schema for making yourself explicit to the AI you work with, plus a ritual for doing it without starting from a blank page.**
+**Your working rules for AI in about 15 minutes, in ChatGPT, Codex or Claude Code. Then, if you want it, a full identity layer that the same files grow into.**
 
-> **Status: v0.1 alpha.** Concept-level. Read to understand the idea; implementation is minimal. Pairs with [Obsidian Seed](https://github.com/dkushnikov/obsidian-seed) (substrate) but works with any substrate that supports CLAUDE.md and persistent memory.
+> **Status: v0.2 alpha, unreleased (2026-11-10).** The short route is new. The identity schema and the full interview are the v0.1 material, reworked for three environments. Pairs with [Obsidian Seed](https://github.com/dkushnikov/obsidian-seed) when you want a vault; works without it.
 
 ---
 
-## What this is
+## Start here: rules in 15 minutes, no install
 
-Atlas Seed is a small collection of files and a process for populating them. The files describe **who you are** in a form that an AI partner can read and reason about — not your notes, not your data, but your identity: values, roles, strengths, working style, compass, complementarity with the AI.
+1. Open a **new chat**. ChatGPT on any plan is enough. Claude, Codex and Claude Code work the same way.
+2. Copy the prompt from [prompts/start.md](prompts/start.md): everything inside the code block, English or Russian. Paste it as your first message.
+3. Answer three questions. You get a draft of 5–7 rules. Refine it until every rule says what the assistant *does*. Accept it.
+4. Try your task under the rules. Make one correction. The assistant answers with one `rule:` line.
+5. Save the two things the assistant gives you: the Markdown document (the source; keep it as a file) and the short form (paste it into the assistant's settings). Where exactly, for each environment: [environments.md](environments.md).
 
-The process is a structured interview + optional ingest from existing writing, with an iterate-from-use protocol for refinement. The output is a set of markdown files with frontmatter, living in `core/identity/` in your environment, loaded automatically by your AI through a walk-up chain pattern.
+Afterwards you have a text that turns "I value directness" into "state a significant objection before the answer", one correction already folded in, and a place the next chat reads it from. You do not have a description of yourself, a personality profile, or a system that updates itself. The rules grow by hand: each correction is one line you add.
 
-This is the *identity layer*. It's distinct from:
+Fifteen minutes is the target, not a measurement. The author ran the prompt non-interactively in Codex and Claude Code on 2026-11-10 with a fictional persona ([environments.md § Verified runs](environments.md#verified-runs)); the ChatGPT product itself and a first-time user's timing are not recorded yet. If you run it, time it and open an issue with the number.
 
-- **Your vault or notes** — those are content. Identity is frame.
-- **Tool configuration** — that's plumbing. Identity is what the plumbing serves.
-- **AI memory** — that's runtime state. Identity is the stable substrate memory sits on.
-- **Personality templates** — those are fictional. Identity is yours, evolved through use.
+## Choose your environment
 
-If you've used Obsidian Seed to build a vault, Atlas Seed is the layer that sits on top of your vault and gives the AI an explicit model of *you*. If you haven't used Obsidian Seed, Atlas Seed still works — you just need any environment that supports CLAUDE.md and persistent memory.
+| You use | The rules live in | The next chat reads them | Guide |
+|---|---|---|---|
+| ChatGPT | Custom instructions (all your chats) or one Project's instructions (that project). The document stays a file you keep. | By itself, within the scope you chose | [environments.md § ChatGPT](environments.md#chatgpt) |
+| Codex (CLI, IDE, app) | `working-rules.md` and `AGENTS.md` in a folder of yours | By itself when you start Codex in that folder | [environments.md § Codex](environments.md#codex) |
+| Claude Code | The same folder; `CLAUDE.md` imports `AGENTS.md` | By itself when you run `claude` there | [environments.md § Claude Code](environments.md#claude-code) |
+| Codex and Claude Code together | One `AGENTS.md`, one import, one folder | Both | [environments.md § one folder](environments.md#codex-and-claude-code-in-one-folder) |
 
-## What this is NOT
+Nothing moves between products by itself. When you switch products, you paste the text.
 
-- **Not a productivity system.** No habit trackers, no goal frameworks, no task managers. Those are tools you can build inside your substrate; Atlas Seed doesn't touch them.
-- **Not a therapy exercise.** The interview asks about who you are, but it's oriented at making you legible to an AI partner, not at self-discovery for its own sake. Self-discovery may happen as a side effect. That's fine. It's not the goal.
-- **Not a replacement for your substrate.** You still need a place where your notes, decisions, and session logs live. That's what substrates (Obsidian Seed, other) are for. Atlas Seed is additive.
-- **Not a fork of personal-context or other similar projects.** Those are portraits — static snapshots for giving LLMs a voice. Atlas Seed is a working identity — live, evolving, memory-integrated, partner-oriented. Different genres.
-- **Not finished.** v0.1 alpha is a concept-level release. Expect breaking changes. Expect gaps. Open an issue if something is missing or wrong.
+## Four things, kept apart
 
-## The five components of v0.1 alpha
+Atlas Seed distinguishes four things that most "AI + personal context" setups blur:
 
-Atlas Seed alpha has five concrete components. Each is a document or a small collection of files. Together they define the identity layer and how to populate it.
+1. **Personal context** — facts, values and preferences you have confirmed. Short route: three lines (task, role, how you work). Full route: the identity files.
+2. **Interaction rules** — observable behaviour you expect from the AI. `working-rules.md`. This is what the short route produces.
+3. **Work state** — decisions, corrections, open questions, next step. Short route: the corrections log inside `working-rules.md`. With a vault: Obsidian Seed's `_claude/`.
+4. **Environment mechanism** — where each of these is stored, what the tool reads by itself, who updates it, what the next chat sees. [environments.md](environments.md).
 
-### 1. Identity schema (8 files)
+A guess about you is not a fact until you confirm it. You may skip any question. Rules you write do not change the priority of the platform's own instructions, do not lift the environment's limits, and give the assistant no access to other data.
 
-Eight markdown files with frontmatter, each covering one dimension of identity:
+## Going deeper: the identity layer
+
+The short route gives the assistant rules. The full route gives it a model of *you*: eight markdown files with provenance frontmatter, populated in a 90–120 minute interview. Schema: [identity-schema.md](identity-schema.md). Process: [bootstrap-ritual.md](bootstrap-ritual.md).
 
 | File | What it holds |
 |------|---|
-| `SOUL.md` | Constitution — stable principles that anchor who you are (≤1 page, 5-8 items) |
-| `roles.md` | The hats you wear — when to be which, triggered by what, with autonomy tiers |
-| `life-capitals.md` | Your resource portfolio — the dimensions of life you invest in (framework, not content) |
-| `life-compass.md` | Values + navigation — how you decide when capitals conflict |
-| `me-summary.md` | Compact self-portrait — who you are in one page for fast loading |
-| `psychometrics-summary.md` | Optional self-knowledge integration (CliftonStrengths, Hogan, etc.) |
-| `working-style.md` | How you work with AI — extracted from accumulated interaction |
-| `complementarity.md` | Where you and the AI complement each other (compensation, amplification, enablement) |
+| `SOUL.md` | Constitution — stable principles that anchor who you are |
+| `roles.md` | The hats you wear, their triggers, how much autonomy the AI has in each |
+| `life-capitals.md` | The dimensions of life you invest in |
+| `life-compass.md` | Values and the principles you navigate by |
+| `me-summary.md` | One-page self-portrait, the file that loads first |
+| `psychometrics-summary.md` | Optional: formal assessments, compressed |
+| `working-style.md` | How you work with AI: the long form of `working-rules.md` after a month of use |
+| `complementarity.md` | Where you and the AI complement each other |
 
-Each file carries frontmatter with `type`, `subtype`, `created`, `updated`, `sources`. This provenance lets you know six months from now whether a principle is still load-bearing or a fossil.
+How the two routes relate: the identity files **describe the person**; the working rules **prescribe the AI's behaviour**. The rules are justified by the description, but the AI acts on the rules. `working-rules.md` is the seed of `working-style.md`. Running the full route later does not replace it; it reads the approved rules first and proposes changes.
 
-The eight files are not a template to fill in — they're a schema that the bootstrap ritual populates through conversation and ingest.
+The full route needs a place for files (a folder you open with Codex or Claude Code, or files you save by hand from a ChatGPT chat) and an evening. Git is recommended for folders and not required. Nothing in it installs the author's own setup; there is no ingest script and no integration in this repository.
 
-### 2. Bootstrap ritual
+## With or without Obsidian Seed
 
-A three-part process for going from zero to populated identity files:
+Atlas Seed is about who you are and how you want the AI to behave. It is not a place for notes, decisions and a journal. When you want those, use [Obsidian Seed](https://github.com/dkushnikov/obsidian-seed): it builds a personal vault with the same four-way split and the same `AGENTS.md` + `CLAUDE.md` convention, so the rules you wrote here go into the vault unchanged.
 
-**Interview (90 minutes).** Structured conversation with Claude covering each dimension. The AI asks, you answer. Claude proposes drafts for each file based on your answers. You refine. You ship.
+Order does not matter. Rules first, vault later, or the other way round.
 
-**Ingest (optional, parallel).** If you have existing writing — blog posts, journals, letters, notes — you can point the bootstrap script at them. Claude reads, summarizes patterns, proposes draft identity files based on inferred voice and values. You edit the drafts. This reuses the Mnemon capture pipeline (same pattern, different target corpus).
+## Limits
 
-**Iterate from use (ongoing).** The best edits come from noticing when the AI gets something wrong. When Claude writes a message in your voice and it feels off — fix the relevant file. When Claude misremembers your priorities — update `life-capitals.md`. When a role trigger fires at the wrong time — tune `roles.md`. Identity is not static; it evolves through observed misalignment.
+- **Instructions, not enforcement.** A rule in a file is context for the model. It can be missed. When it is, say so and sharpen the wording.
+- **No automatic loading from a link.** Pasting this repository's URL into a chat does not make the chat read it. The prompt is self-contained for that reason.
+- **No sync between products.** Custom instructions, `AGENTS.md`, `CLAUDE.md` and each product's memory are separate stores. You carry the text.
+- **Your text goes to the provider.** What you write into the rules and the identity files is sent to OpenAI or Anthropic like any other message. Write accordingly.
+- **Not the author's Atlas.** The author's setup has hooks, pipelines and integrations. None of that is in this repository; the seed is Markdown and a few prompts.
 
-The bootstrap ritual does not produce perfect identity files. It produces *populated starting points* that you refine over the first month of use.
+## Files in this repository
 
-### 3. Walk-up chain spec
+| File | Role |
+|---|---|
+| [prompts/start.md](prompts/start.md) | The copyable start prompt (English and Russian) |
+| [prompts/continue.md](prompts/continue.md) | Prompts for the next chat, for updates, for re-running |
+| [templates/working-rules.md](templates/working-rules.md) | The Markdown source with its derived short form and corrections log |
+| [templates/AGENTS.md](templates/AGENTS.md), [templates/CLAUDE.md](templates/CLAUDE.md) | Instruction files for a folder you open with Codex or Claude Code |
+| [environments.md](environments.md) | What each environment reads, saves and does not do |
+| [bootstrap-ritual.md](bootstrap-ritual.md) | Short route, full interview, re-running, iterate from use |
+| [identity-schema.md](identity-schema.md) | The eight identity files |
+| [walk-up-chain.md](walk-up-chain.md) | How context reaches a session; the contract any environment must meet |
+| [knowledge-metabolism-interface.md](knowledge-metabolism-interface.md) | What a knowledge tool may read from the identity layer |
+| `AGENTS.md`, `CLAUDE.md` | Instructions for an agent started inside this checkout: personal files do not belong here |
 
-How the identity files get loaded into any AI session.
+## Current state (2026-11-10)
 
-Atlas Seed does not require a specific AI platform or environment — but it does require the environment to support **hierarchical config loading**. Claude Code calls this the "walk-up chain": at session start, Claude reads configuration from multiple levels (global → user → project → session), with closer-scoped files overriding farther-scoped ones.
+- **Short route:** prompt, templates and environment guide written; runs with a fictional persona in Codex CLI 0.166.0 and Claude Code 2.1.319 recorded in [environments.md](environments.md#verified-runs), including a hand edit of the rules picked up by both tools; the ChatGPT product path described from the help center, not run there, not yet timed by a first-time user.
+- **Identity schema:** eight files, in use by the author since 2026-03.
+- **Full interview:** documented; tested by the author only.
+- **Loading mechanism:** documented per environment; hierarchical loading is optional, not a requirement.
+- **Knowledge Metabolism interface:** a contract, not a library. [Mnemon](https://github.com/dkushnikov/mnemon) is a compatible consumer.
 
-The walk-up chain spec defines:
-
-- **Where identity files live** (`core/identity/` in your environment)
-- **How they're referenced** from the environment's top-level configuration (typically `CLAUDE.md`)
-- **Load order** (identity before project-specific overrides)
-- **Substrate requirements** — what any substrate must provide for Atlas Seed to work
-- **Privacy boundaries** — how identity doesn't leak across bounded contexts (multi-vault, multi-profile)
-
-See `walk-up-chain.md` in this repo for the full spec.
-
-### 4. Positioning — substrate-agnostic
-
-Atlas Seed works with any substrate that provides:
-
-- A location for identity files to live
-- A top-level configuration file (`CLAUDE.md` by convention) that can reference them
-- Persistent memory the AI reads at session start
-- Session logs or equivalent continuity infrastructure
-
-Obsidian Seed is one substrate. A bare Claude Code project with a few rules is another. A hypothetical future mobile/web AI environment would be a third — as long as it supports the four requirements above.
-
-**The substrate is an interface, not a product.** If you're using Atlas Seed and you migrate substrates later, your identity files come with you. The substrate is replaceable; identity is yours.
-
-This framing is prospectively important: generic knowledge aggregation (articles, books, search) will be increasingly displaced by personalization (AI adapted to your context). In that future, identity is the moat — it's what makes your AI *yours*. Keeping the substrate interface clean protects that investment.
-
-### 5. Knowledge Metabolism — identity-side interface
-
-Atlas Seed does not define or own the Knowledge Metabolism concept. That lives in a separate research project (see the repo's `PHILOSOPHY.md` for links). Knowledge Metabolism is the broader framework for how knowledge moves through a system: capture → extract → personalize → structure → retrieve → feedback.
-
-Atlas Seed contributes **the identity-side interface**: what Knowledge Metabolism systems need from an identity layer to personalize processing per user.
-
-Concretely: when a Knowledge Metabolism tool (like [Mnemon](https://github.com/dkushnikov/mnemon)) processes an incoming source and needs to decide *how to frame this for the user*, it reads the identity layer. Values and compass inform relevance ranking. Roles inform tone. Working style informs output format. Life Capitals inform where the extract gets routed. Complementarity informs what to highlight vs what to skip.
-
-Without identity, Knowledge Metabolism produces generic extracts. With identity, it produces personalized ones. Atlas Seed alpha defines the *interface contract* between identity layer and any KM implementation. It does not prescribe the implementation.
-
-See `knowledge-metabolism-interface.md` in this repo for the contract details.
-
-## How to use this
-
-### If you already have Obsidian Seed
-
-1. Clone this repo alongside your existing `obsidian-seed` setup.
-2. Run the bootstrap interview (`claude` in this directory, say "Run the bootstrap ritual for Atlas Seed").
-3. Your identity files land in `core/identity/` — either in `~/Atlas/` if you have that, or in a location of your choosing.
-4. Reference them from your vault's `CLAUDE.md` via walk-up chain pattern.
-5. Iterate from use over the first month.
-
-### If you don't have Obsidian Seed
-
-You can use Atlas Seed as a thin standalone layer on top of any Claude Code project:
-
-1. Clone this repo.
-2. Create a `~/.claude/` directory if you don't have one.
-3. Run the bootstrap interview.
-4. Identity files go in your global Claude Code config.
-5. Any project you work in reads identity through walk-up chain.
-
-You don't need a vault. You do need persistent memory and the ability to reference identity files from a top-level config.
-
-### If you're considering both
-
-We recommend starting with Obsidian Seed first (it gives you the substrate), then layering Atlas Seed on top (it gives you the identity). But the order doesn't fundamentally matter — both work as standalone or combined.
-
-## Current state (2026-04-11)
-
-- **Schema:** 8 identity file templates with provenance frontmatter — working, in use by the project author for ~6 weeks
-- **Bootstrap ritual:** interview protocol documented, ingest script conceptual (not yet shipped as executable)
-- **Walk-up chain spec:** documented, working in Obsidian Seed vaults
-- **Positioning:** this document
-- **Knowledge Metabolism interface:** contract documented, Mnemon is a compatible consumer
-
-**What alpha means here:** the schema and walk-up chain are proven in the author's setup. The bootstrap ritual needs external testing. The ingest script needs building. The Knowledge Metabolism interface is a contract, not a library — any implementer can conform to it.
-
-**What you should expect:** breaking schema changes between v0.1 and v0.2. Missing implementations. Undocumented assumptions. This is alpha. If you're looking for stability, wait for v0.3+.
+Expect schema changes between v0.2 and v0.3. Open an issue when something is missing, wrong or surprising.
 
 ## Relationship to other projects
 
-- **[Obsidian Seed](https://github.com/dkushnikov/obsidian-seed)** — substrate layer. Where knowledge lives. Atlas Seed sits on top of any Obsidian Seed vault and adds the identity layer.
-- **[Mnemon](https://github.com/dkushnikov/mnemon)** — one concrete implementation of Knowledge Metabolism. Consumes Atlas Seed identity layer via the interface contract (component #5) to personalize knowledge processing.
-- **[Nestor](https://github.com/dkushnikov/nestor-plugin)** — multi-model deliberation plugin. Could consume Atlas Seed identity to better frame questions for the council, but doesn't currently. Possible integration point for v0.2+.
-- **[claude-environment](https://github.com/dkushnikov/claude-environment)** — infrastructure layer for Claude Code (multi-machine setup, data pipelines). Orthogonal to Atlas Seed — identity is content, environment is plumbing.
+- **[Obsidian Seed](https://github.com/dkushnikov/obsidian-seed)** — the vault: notes, decisions, journal, continuity. Atlas Seed sits beside it.
+- **[Mnemon](https://github.com/dkushnikov/mnemon)** — a knowledge library with an AI reader. Can read the identity layer through the interface contract.
+- **[Nestor](https://github.com/dkushnikov/nestor-plugin)** — multi-model deliberation plugin. Not integrated.
+- **[claude-environment](https://github.com/dkushnikov/claude-environment)** — infrastructure for a multi-machine Claude Code setup. Orthogonal.
 
-## Philosophy (the short version)
+## Philosophy, in short
 
-Most "AI + personal context" attempts fail because they confuse three things: your *notes* (content), your *tools* (plumbing), and your *self* (identity). They try to feed the AI notes and expect it to learn who you are. It doesn't work — or works slowly, partially, inconsistently.
+Most attempts at "AI + personal context" confuse three things: your *notes* (content), your *tools* (plumbing) and your *self* (identity). They feed the AI notes and expect it to learn who you are. It works slowly, partially, inconsistently.
 
-Atlas Seed takes the opposite approach: **make yourself explicit, up front, in a form the AI can load in every session**. Not everything about you — just enough that the AI has a working model. Values, roles, compass, working style, complementarity. Eight small files. Less than a day to populate. Loaded automatically forever after.
-
-The effect compounds. Session one with identity feels like session one with a smart stranger who read your resume. Session ten feels like session ten with a partner who has *thought about* your resume. The difference is identity being *present in the loop*, not retrieved on demand.
-
-For the longer philosophy, see `PHILOSOPHY.md`.
+Atlas Seed does the opposite: make the rules explicit first, in a form the AI reads at the start of a chat, and let them grow from corrections. Then, when the rules stop being enough, make yourself explicit too. Eight small files. The substrate is replaceable; the files are yours.
 
 ## Contributing
 
-This is v0.1 alpha. The most useful contribution is **running it**: go through the bootstrap ritual, tell us where it broke, tell us what was missing, tell us what was surprising. Open an issue.
-
-We're not yet accepting PRs on the schema — it's stabilizing. PRs on documentation, typos, examples, and the walk-up chain spec are welcome.
+The most useful contribution is running it and reporting what happened: where it broke, what was missing, how long it took. Open an issue. Pull requests on prompts, templates, documentation and the environment guide are welcome; the schema is still settling.
 
 ## License
 
@@ -174,4 +121,4 @@ MIT
 
 ## Credits
 
-Born out of Obsidian Seed and the broader Atlas project. Inspired by — but different from — [personal-context](https://github.com/amr05008/personal-context) (portraits vs working identities, different genres). Converged with [Karpathy's Raw → Wiki → Frontend pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) on the underlying architecture of personal AI systems. Knowledge Metabolism framework developed independently.
+Born out of Obsidian Seed and the broader Atlas project. Inspired by, and different from, [personal-context](https://github.com/amr05008/personal-context) (portraits versus working identities). Converged with [Karpathy's Raw → Wiki → Frontend pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) on the architecture of personal AI systems.

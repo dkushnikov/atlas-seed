@@ -1,210 +1,102 @@
-# Walk-Up Chain Spec
+# Walk-Up Chain — how context reaches a session
 
-**How identity files get loaded into every AI session, across any substrate.**
+**What each environment loads by itself, what it loads when asked, and what nothing loads. The contract Atlas Seed expects from any environment.**
 
-> **Audience:** this spec is for people who want to implement Atlas Seed on a substrate other than Claude Code, OR who want to understand exactly how Claude Code loads the identity layer. If you're just a user running Atlas Seed with Claude Code + Obsidian Seed, this spec is background — you don't need to read it to use the system.
-
----
-
-## What "walk-up chain" means
-
-**Walk-up chain** is a hierarchical configuration loading pattern: at session start, the AI reads configuration from multiple levels of scope, starting at the broadest (global) and walking toward the narrowest (project/session), with closer-scoped files overriding or augmenting farther-scoped ones.
-
-The term comes from how Claude Code loads `CLAUDE.md` files: it starts at the project directory, then walks *up* the directory tree (checking each parent for a `CLAUDE.md`), then consults user-global and system-global levels. Each `CLAUDE.md` it finds gets loaded, with closer files having higher precedence.
-
-For Atlas Seed, the walk-up chain is how identity files become available to every session automatically — no manual imports, no session-start boilerplate, no copy-paste between projects.
-
-**The core claim:** if the substrate supports a walk-up chain, the identity layer can be made available to every session with zero per-session effort. If the substrate doesn't support it, identity loading becomes manual and the value drops sharply.
-
-## Heritage
-
-Walk-up chain as a concept comes from the Unified Claude project (2026-04). It was the mechanism that allowed a single identity definition (Atlas) to be visible across multiple project-scoped Claude Code sessions without duplication. The same pattern was then generalized as the preferred way to load any cross-project configuration in Claude Code.
-
-Atlas Seed inherits this pattern and formalizes it as the identity loading mechanism. The pattern was developed as part of the Atlas project for unified AI identity management.
-
-## The spec
-
-### Load order
-
-Atlas Seed expects the following load order during session start, from broadest to narrowest:
-
-1. **System-global configuration** — whatever the substrate uses for system-wide settings (usually absent for personal use)
-2. **User-global configuration** — `~/.claude/CLAUDE.md` in the Claude Code case, or equivalent in other substrates
-3. **Atlas-user configuration** — `~/Atlas/core/CLAUDE.md` in the reference implementation. This is where identity files are referenced via walk-up.
-4. **Project/vault configuration** — `<project_root>/CLAUDE.md`, the closest scope. Inherits from above, can override.
-5. **Session-specific overrides** — transient, via session start hooks or runtime instructions. Not persistent.
-
-**Identity files are referenced at level 3 (Atlas-user configuration).** The file `~/Atlas/core/CLAUDE.md` contains pointers into `~/Atlas/core/identity/` (the eight identity files described in `identity-schema.md`). Because level 3 sits in the walk-up chain, every project-level session inherits the identity reference automatically.
-
-### The reference mechanism
-
-The identity files are not *copied* into each session — they are *referenced* from the Atlas-user CLAUDE.md. The reference takes the form of explicit path or import statement, depending on substrate.
-
-In Claude Code specifically:
-
-```markdown
-# Atlas — Unified AI Identity
-
-I am Atlas — [user]'s AI partner.
-
-Soul, roles, working-style, and person framework are in `~/Atlas/core/identity/`
-(load on demand when session work requires depth).
-```
-
-Note the phrase **"load on demand when session work requires depth"**: identity files are NOT loaded into the context window at session start by default. They are *referenced* — Claude knows where they are and loads them when work requires it. This is a deliberate choice to keep session start costs low while preserving identity availability.
-
-For substrates without lazy-load semantics, an alternative is a compact summary that loads at session start (e.g. `me-summary.md`, kept deliberately short) with full files loaded on demand.
-
-### How closer scopes interact with identity
-
-A project-level `CLAUDE.md` (level 4 in the chain) does NOT typically override identity — identity is stable, project-level is situational. The standard interaction is:
-
-- **Project inherits identity** from the walk-up chain (level 3)
-- **Project adds project-specific context** (vault structure, conventions, current work)
-- **Project does NOT contradict identity** (if a project CLAUDE.md says "don't challenge me", and SOUL.md says "challenge is the contract", the Soul wins)
-
-Projects that genuinely need to adjust identity (e.g., role mode switching for work vs personal contexts) should do so via explicit role activation, not by re-defining identity.
-
-### Privacy boundaries
-
-The walk-up chain respects bounded contexts. Specifically:
-
-- **Identity is readable across all bounded contexts** by default — this is the point of a stable self.
-- **Project memory and session logs are NOT readable across bounded contexts** — these are project-scoped.
-- **Certain vaults (Sanctum, Private) may exclude even identity references** if they're designed for isolation. Sanctum's privacy policy overrides identity loading — Atlas Seed respects substrate-level privacy.
-
-In practice: if a substrate has a deny-all-export policy for a particular vault, identity loading should be EITHER skipped entirely OR marked read-only with explicit user consent per session. The Sanctum case is the reference example — see Obsidian Seed documentation on vault-level privacy.
-
-**Concrete guarantee:** no session log, no memory write, and no Claude response inside a bounded private context leaks back into the identity layer. Identity is a read source for private contexts, not a write target.
+> **Audience:** people who want to understand exactly how the rules and identity files get into a session, or who want to host Atlas Seed in an environment not covered here. The practical page is [environments.md](environments.md). The short route in ChatGPT does not need anything on this page.
 
 ---
 
-## Substrate requirements
+## The term
 
-**Any substrate that hosts Atlas Seed must provide the following.** If a substrate can't meet these requirements, Atlas Seed won't work without adaptation.
+**Walk-up chain** is Claude Code's loading pattern: at launch it reads `CLAUDE.md` from the working directory and from every directory above it, then the user-level `~/.claude/CLAUDE.md`, and concatenates them, closest file last. Codex does the mirror image: it reads `~/.codex/AGENTS.md`, then walks *down* from the project root to the working directory, one `AGENTS.md` per directory, up to 32 KiB. ChatGPT has no directories; it has custom instructions, a Project's instructions and the Project's files.
 
-### R1: Hierarchical configuration loading
+The pattern gives one thing: a file placed at a higher level reaches every session below it without being copied. Atlas Seed uses that when it is there and does without it when it is not.
 
-The substrate must load configuration from multiple scope levels automatically at session start, with closer-scoped files augmenting or overriding broader ones.
+## What loads, by level
 
-Claude Code satisfies this natively via `CLAUDE.md` walk-up. Other substrates may need a plugin, hook, or manual import mechanism.
+| Level | ChatGPT | Codex | Claude Code |
+|---|---|---|---|
+| Global (every chat) | Custom instructions | `~/.codex/AGENTS.md` | `~/.claude/CLAUDE.md`, `~/.claude/rules/` |
+| Scope (one project or folder) | A Project's instructions and files | `AGENTS.md` from the project root down to the working directory | `CLAUDE.md` from the working directory upward, `.claude/rules/`, `@imports` |
+| On demand | Text you paste, files you upload | Files the agent opens when the instructions or you name them | Files the agent reads when the instructions or you name them |
+| Never by itself | Your disk, a link's content, another product's store | Custom instructions, `CLAUDE.md`, Claude's memory | `~/.codex/AGENTS.md`, Codex memories, custom instructions |
 
-**Minimum:** at least two levels — user-global and project-local.
-**Recommended:** three or more levels including an intermediate "Atlas-user" level for identity.
+Sources, checked 2026-11-10: [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md), [Claude Code memory](https://code.claude.com/docs/en/memory), [ChatGPT custom instructions](https://help.openai.com/en/articles/8096356-chatgpt-custom-instructions), [ChatGPT Projects](https://help.openai.com/en/articles/10169521-projects-in-chatgpt).
 
-### R2: Stable file paths for identity
+## The loading contract
 
-The substrate must support a stable location where identity files live, accessible from config loading.
+What Atlas Seed can rely on, and what it cannot:
 
-Reference implementation: `~/Atlas/core/identity/` on a Unix filesystem, with the eight identity files as flat markdown.
+- **The instruction file loads at the start.** `AGENTS.md` in Codex, `CLAUDE.md` with its `@imports` in Claude Code, custom instructions in ChatGPT. This is mechanical.
+- **Files the instruction file names load when the agent opens them.** "Read `working-rules.md` first" is honoured by the model, not by the tool. It is reliable in practice and not guaranteed. In Claude Code an `@working-rules.md` import is mechanical; in Codex there is no import, so the pointer is the mechanism.
+- **A marker makes loading observable.** The template `AGENTS.md` asks for one line at the start of the first answer, `rules vN loaded`. No line, no load.
+- **Nothing is loaded in full by default except what you put at the global or scope level.** The identity files are referenced, not inlined: `me-summary.md` is the one worth naming at the top; the rest the agent reads when the work needs depth. This keeps the start of a session cheap.
+- **A link loads nothing.** A URL in a chat is text.
 
-**Requirement:** path must be stable across sessions, machines (via sync), and substrate upgrades. Identity files are the most stable artifacts in the system; their path shouldn't break on every tool update.
+In the author's own setup the user-level file says, in effect, *"identity files are in `core/identity/`; load on demand when the work requires depth"*. That is a pointer, not an inline, and it is why the author's sessions start small.
 
-**Acceptable alternatives:** Cloud-sync directory (iCloud, Dropbox, Syncthing), git repository, or a substrate-managed location with a stable canonical path.
+## Closer scopes and contradictions
 
-### R3: On-demand file loading
+There is no priority mechanism in Markdown. When a project file says "do not challenge me" and the rules say "state a significant objection first", the model picks one, and not always the same one. Keep the two consistent, and when a project needs an exception, write the exception into the project file explicitly ("in this folder, objections after the answer, not before"). A rule that depends on being "higher" than another file is a rule that will fail.
 
-The substrate's AI must support reading additional files during a session when instructed. Identity files are referenced at session start but loaded lazily when work requires depth.
+## Privacy boundaries
 
-Claude Code satisfies this via the Read tool. Other substrates need equivalent capability.
+The identity files are about you. Where they are readable is a decision with two layers:
 
-**Fallback for substrates without lazy load:** preload a compact summary (`me-summary.md`) at session start, load full files only when explicitly invoked. Costs more session-start tokens but still works.
+1. **Policy**, which you write: which folders or projects get the rules, which get the identity files, which get nothing. A Markdown line stating the policy makes the agent aware of it and does not enforce it.
+2. **Mechanism**, which the tool provides: Codex permission profiles and sandboxes, Claude Code permission rules (`permissions.deny` on paths, the `--add-dir` boundary), separate folders, separate ChatGPT Projects with project-only memory. These are enforced by the tool, and only to the extent the tool documents.
 
-### R4: Persistent memory
+Atlas Seed asks for a policy and names the mechanisms. It does not provide a guarantee that identity never leaks into a private context, and no Markdown instruction can. The author's own private vault is isolated by tool permissions and by not being a source folder for any agent, not by a line in a file.
 
-The substrate must support persistent memory the AI reads at session start — decisions, preferences, and context that survive between sessions.
+What this means for a knowledge tool reading the identity layer: it reads what the environment lets it read ([knowledge-metabolism-interface.md](knowledge-metabolism-interface.md) § A5).
 
-Claude Code calls this `MEMORY.md` (auto-memory). Other substrates may use different mechanisms (memory plugins, embedded databases, session log history).
+## Requirements for an environment
 
-**Requirement:** memory must be *writable during session* and *readable at next session start*. One-way load or manual copy-paste doesn't count.
+Any environment that hosts Atlas Seed needs the following. The short route needs only R1 and R2.
 
-### R5: Session continuity infrastructure
+### R1: A stable place for files
 
-The substrate must support session logs or equivalent continuity — a way to record what a session accomplished, referenceable by future sessions.
+A folder, a note store, a Project. The path should survive sessions and tool updates. Cloud sync and Git are preferences, not requirements.
 
-Reference implementation: `_claude/session-logs/YYYY-MM-DD — Title.md` files in each vault.
+### R2: An instruction surface the tool reads at the start
 
-**Requirement:** session history must be retrievable by the AI at next session start, not just stored-for-humans.
+Custom instructions, `AGENTS.md`, `CLAUDE.md`. If the environment has none, the user pastes the document at the start of every chat; the method still works, with more friction.
 
-### R6: Minimum frontmatter schema support
+### R3: On-demand reading of files
 
-Identity files carry frontmatter for provenance:
+The agent can open a file the instructions name. Codex and Claude Code have this. ChatGPT has it for uploaded files within a chat or a Project.
 
-```yaml
----
-type: identity
-subtype: soul
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-sources:
-  - "session: YYYY-MM-DD — title"
-  - "path to canonical long version, if any"
----
-```
+### R4: A carrier for work state
 
-The substrate doesn't need to enforce this schema, but the AI must be able to parse it. Claude Code handles this natively (reads YAML frontmatter in markdown files). Other substrates: verify frontmatter parsing before adopting Atlas Seed.
+Somewhere the decisions, corrections and the next step survive between sessions: the corrections log in `working-rules.md`, or Obsidian Seed's `_claude/` files in a vault. A product's own memory (ChatGPT memory, Codex memories, Claude Code auto memory) is a supplement: you cannot read it as a file, and it does not move between products.
 
-### R7: Privacy boundaries respect
+### R5: Frontmatter tolerance
 
-If the substrate supports bounded contexts (multiple vaults, profiles, isolated projects), the substrate must provide a way to:
+The identity files carry YAML frontmatter for provenance. The environment does not need to parse it; the model needs to read past it. Every current environment does.
 
-- Mark contexts as "identity-excluded" (identity not loaded)
-- Prevent session memory or logs from leaking across boundaries
-- Distinguish "read identity, don't write" from "read and write"
+### Optional: hierarchical loading
 
-This is necessary for privacy-sensitive contexts. See the Sanctum reference case in Obsidian Seed documentation.
+Needed only for the global-plus-scope split (rules in every project without copying). Codex and Claude Code have it. ChatGPT has a two-level version: custom instructions plus a Project's instructions, where the project's instructions override the global ones.
 
-### Non-requirements (explicit)
+### Explicitly not required
 
-Substrates do NOT need to provide:
-
-- **A vault** (identity works without one — Obsidian Seed is just one substrate option)
-- **A graph view** (identity is flat markdown, no graph traversal required)
-- **Mobile access** (identity works on any platform the AI can run on, but mobile is not a hard requirement)
-- **Cloud sync** (local-only substrates work; sync is user preference, not architectural requirement)
-- **Version control** (git is recommended but not required; identity files work without git)
-- **Real-time editing** (identity files are edited between sessions, not during)
-
----
+A vault, a graph view, mobile access, cloud sync, version control, real-time editing.
 
 ## Portability
 
-A key claim of Atlas Seed is that identity is **portable across substrates**. If you set up Atlas Seed today with Claude Code + Obsidian Seed, and in two years you migrate to a different AI environment, your identity files come with you.
+The identity files and the working rules are flat Markdown with YAML frontmatter. They move between environments unchanged. What does not move: the instruction surface (custom instructions, `AGENTS.md` content specific to a tool), each product's memory, session logs. When you change products, copy the files and rewrite the pointer; nothing else carries over.
 
-**What makes this possible:**
+## Hosting Atlas Seed somewhere new
 
-- Identity files are flat markdown with YAML frontmatter — works anywhere markdown works
-- The schema is substrate-agnostic — no assumptions about Claude, Obsidian, or any specific tool
-- The walk-up chain pattern is implementable on most substrates (direct support in Claude Code, plugin/hook support possible in others)
-- Privacy boundaries are policy, not implementation — any substrate with access control can respect them
+1. Check R1–R5. Note which are missing and what the workaround is.
+2. Name the instruction surface and what it loads at the start.
+3. Choose the stable path for the files and write it into the instruction surface.
+4. Put the `rules vN loaded` marker in and check it appears.
+5. Test the boundary you care about: start a session where the rules should not apply and confirm the marker is absent.
+6. Write the result up as a section of [environments.md](environments.md) and open a pull request.
 
-**What doesn't come with you:**
+## Future work
 
-- Substrate-specific configuration (CLAUDE.md contents, Obsidian vault conventions)
-- Runtime memory (MEMORY.md gets reset unless you also migrate that)
-- Session logs (unless you manually migrate the directory)
-
-**The interface boundary:** identity files and their schema are portable. Everything else is substrate-coupled. If you're designing Atlas Seed usage for portability, keep identity separate from substrate-specific content.
-
----
-
-## Implementing on a non-Claude-Code substrate
-
-If you're porting Atlas Seed to a substrate other than Claude Code, this checklist helps:
-
-1. **Verify substrate satisfies R1-R7** (requirements above). If any are missing, identify workarounds or decide whether the substrate is compatible.
-2. **Map substrate's config loading mechanism to the walk-up chain concept.** Document how level 3 (Atlas-user config) will work.
-3. **Choose a stable path for identity files.** Document the expected absolute path in the substrate's conventions.
-4. **Implement identity references** in the substrate's user-global config, pointing at the identity files.
-5. **Test privacy boundaries** — verify bounded contexts don't leak identity writes or session content.
-6. **Document substrate-specific quirks** in a section labeled "On [substrate]" in this spec or a sibling doc.
-7. **Share your implementation** — open a PR to this repo with a new document describing the adaptation. Helps the next person.
-
-## Future work (v0.2+)
-
-Explicitly not in alpha, flagged for future:
-
-- **Automatic substrate detection and adaptation** — right now adoption is manual; future versions could sniff the substrate and configure automatically.
-- **Cross-substrate migration tooling** — scripts that move identity files between substrates with validation.
-- **Walk-up chain verification tool** — a script that checks whether a substrate's config loading actually loads identity correctly (catches silent misconfiguration).
-- **Multi-machine walk-up** — when identity lives on multiple machines (e.g., laptop + server), how does walk-up chain coordinate? Captured in Distributed Atlas project, not alpha scope.
+- A small check that an environment actually loads the rules (the marker line, automated).
+- Migration notes between environments with a validation step.
+- Multi-machine loading, when the files live on more than one computer. Tracked in the author's Distributed Atlas project, not here.
