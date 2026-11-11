@@ -1,6 +1,6 @@
 # Start prompt — your working rules with AI in about 15 minutes
 
-Copy everything inside the block below and paste it as the **first message of a new chat**. It works in ChatGPT on any plan with no files, no terminal and no Git. The same prompt works in Claude, in Codex and in Claude Code. Write your answers in your own language; the assistant follows it.
+Copy everything inside the block below and paste it as the **first message of a new chat**. It works in ChatGPT on any plan with no files, no terminal and no Git. The same prompt works in Claude, in Codex and in Claude Code. Write your answers in your own language; the assistant follows it. The prompt's fixed phrases stay in the language of the block you paste: in ChatGPT the English block gave Russian rules that still said "For approval:" (2026-11-11). If the block exists in your language, paste that one.
 
 What happens: three questions → a draft of 5–7 rules → you refine and accept → you try your task and make one correction → you get a Markdown document to keep and a short form to paste into the assistant's settings. How to save and reconnect in each environment: [environments.md](../environments.md).
 

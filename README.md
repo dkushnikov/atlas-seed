@@ -16,7 +16,7 @@
 
 Afterwards you have a text that turns "I value directness" into "state a significant objection before the answer", one correction already folded in, and a place the next chat reads it from. You do not have a description of yourself, a personality profile, or a system that updates itself. The rules grow by hand: each correction is one line you add.
 
-Fifteen minutes is the target, not a measurement. The author ran the prompt non-interactively in Codex CLI on 2026-11-10 with a fictional persona, and Claude Code then reused the resulting rules in new sessions ([environments.md § Verified runs](environments.md#verified-runs)); the ChatGPT product itself and a first-time user's timing are not recorded yet. If you run it, time it and open an issue with the number.
+Fifteen minutes is the target, not a measurement. The author's runs used a scripted fictional persona ([environments.md § Verified runs](environments.md#verified-runs)): Codex CLI on 2026-11-10, with Claude Code then reusing the resulting rules, and the ChatGPT product on 2026-11-11 (Free plan, both prompt blocks). In ChatGPT the route took 7 messages from the user and about two minutes of the assistant's time. That is not a person's time: reading the draft and typing the answers are yours. A first-time user's timing is not recorded yet. If you run it, time it and open an issue with the number.
 
 ## Choose your environment
 
@@ -88,9 +88,9 @@ Order does not matter. Rules first, vault later, or the other way round.
 | [knowledge-metabolism-interface.md](knowledge-metabolism-interface.md) | What a knowledge tool may read from the identity layer |
 | `AGENTS.md`, `CLAUDE.md` | Instructions for an agent started inside this checkout: personal files do not belong here |
 
-## Current state (2026-11-10)
+## Current state (2026-11-11)
 
-- **Short route:** prompt, templates and environment guide written; runs with a fictional persona recorded in [environments.md](environments.md#verified-runs): the start prompt in Codex CLI 0.166.0, the resulting rules reused in Claude Code 2.1.319, and a hand edit of the rules picked up by both tools; the ChatGPT product path described from the help center, not run there, not yet timed by a first-time user.
+- **Short route:** prompt, templates and environment guide written; runs with a fictional persona recorded in [environments.md](environments.md#verified-runs): the start prompt in Codex CLI 0.166.0, the resulting rules reused in Claude Code 2.1.319, a hand edit of the rules picked up by both tools, and the start prompt in the ChatGPT product (Free plan, 2026-11-11). In ChatGPT, saving the short form and reading it in a new chat is described from the help center and not run. Not yet timed by a first-time user.
 - **Identity schema:** eight files, in use by the author since 2026-03.
 - **Full interview:** documented; tested by the author only.
 - **Loading mechanism:** documented per environment; hierarchical loading is optional, not a requirement.

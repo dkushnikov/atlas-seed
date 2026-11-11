@@ -26,7 +26,7 @@ Sources checked 2026-11-10: [ChatGPT custom instructions](https://help.openai.co
 
 **Connect in the next chat.** Three ways; pick by scope.
 
-- *All chats:* Settings → Personalization → Custom instructions, with "Enable customization" on. Paste the short form. It applies immediately to all chats, including existing ones. Limit: 1,500 characters on Free and Go, 5,000 on Plus, Pro, Business, Enterprise and Education (help center, 2026-11-10). The template keeps the short form under 1,500 so it fits every plan.
+- *All chats:* Settings → Personalization → Custom instructions, with "Enable customization" on. Paste the short form. It applies immediately to all chats, including existing ones. Limit: 1,500 characters on Free and Go, 5,000 on Plus, Pro, Business, Enterprise and Education (help center, 2026-11-10). The template keeps the short form under 1,500 so it fits every plan. The Free limit of 1,500 was also read from the settings page on 2026-11-11; the field shows no counter while it is empty.
 - *One project:* create a Project, paste the short form into the project's instructions, upload the document as a project file. The rules apply only to chats inside that Project. Use this when the rules are for one piece of work, so they do not leak into every chat.
 - *This chat only:* paste the document at the start of the chat ([prompts/continue.md](prompts/continue.md)). Works in a Temporary chat too.
 
@@ -34,7 +34,7 @@ Sources checked 2026-11-10: [ChatGPT custom instructions](https://help.openai.co
 
 **Memory.** ChatGPT may remember things you said. Treat it as a supplement: it can forget, and you cannot read it as a file. Custom instructions are the carrier you control.
 
-**Verified here:** not run in the ChatGPT product by the author (the only account at hand was a personal one; a run there would have mixed in its own memory and settings). The help-center facts above were checked on 2026-11-10; the start prompt was run in Codex CLI, and Claude Code reused the resulting rules in new sessions; see the table at the end. The 15-minute run in ChatGPT is the one check left for a first-time user.
+**Verified here:** the start prompt was run in the ChatGPT product on 2026-11-11: web, Free plan, a test account with memory off, a scripted fictional persona, both prompt blocks; see the table at the end. Not run: pasting the short form into Custom instructions and opening a new chat, a Project with instructions and an uploaded document, the update path. Those steps follow the help center as read on 2026-11-10. A first-time user's timing is the one number still missing.
 
 ## Codex
 
@@ -86,7 +86,7 @@ If the folder already has an `AGENTS.md`, add the pointer to `working-rules.md` 
 
 ## Verified runs
 
-The author's runs on 2026-11-10, macOS, with a fictional persona ("a product manager, decision memo on dropping a free trial") in a throw-away folder, non-interactive: the persona's answers to the three questions, the acceptance and the one correction were given up front in the same message. "Verified" means the run produced the named artifact and the named behaviour; it does not mean every rule is always followed, and it is not a first-time user's timing.
+The author's runs on 2026-11-10, macOS, with a fictional persona ("a product manager, decision memo on dropping a free trial") in a throw-away folder, non-interactive: the persona's answers to the three questions, the acceptance and the one correction were given up front in the same message. "Verified" means the run produced the named artifact and the named behaviour; it does not mean every rule is always followed, and it is not a first-time user's timing. The two ChatGPT rows are from 2026-11-11: a test account on the Free plan with memory off, the same persona, its messages sent turn by turn from a script with no pauses.
 
 | Environment | Version | What ran | Observed |
 |---|---|---|---|
@@ -96,8 +96,12 @@ The author's runs on 2026-11-10, macOS, with a fictional persona ("a product man
 | hand edit | — | Version raised to 2 and a seventh rule added in `working-rules.md` by hand, no chat | — |
 | Codex CLI | 0.166.0 | New run, `[in a hurry]` question | 11 s. `rules v2 loaded`; three lines; one objection; "For approval:". |
 | Claude Code | 2.1.319 | New session, same question | 41 s. `rules v2 loaded`; three lines; one objection; "For approval:". |
-| ChatGPT | — | not run in the product by the author | The help-center facts above are checked; the 15-minute run in ChatGPT itself is still yours to time. |
+| ChatGPT (web) | Free plan, 2026-11-11 | Start prompt, English block, the persona answering in Russian | 2 min 23 s from the first message to the document and the short form; 7 user messages. First question in English, Russian from the second turn. Rules and document in Russian, with the prompt's fixed phrases left in English ("For approval:", "Corrections log"). The correction answered with a `rule:` line. Short form 707 characters ending "(rules v1)". Eight rules, not 5–7. |
+| ChatGPT (web) | Free plan, 2026-11-11 | Start prompt, Russian block, same persona | 1 min 47 s; 7 user messages. Everything in Russian («На утверждение:», «Журнал поправок»); `rule:` and "(rules v1)" in Latin, as the block asks. Short form 873 characters, in paragraphs. Eight rules. |
+| ChatGPT (web) | Free plan, 2026-11-11 | Settings and a temporary Project, read only | Custom instructions limit 1,500 (read from the page). A Project can be created on Free and has an instructions field; the page does not say how it ranks against custom instructions. Not done: saving the short form, a new chat that reads it, a file upload. |
 
 Two readings of this table. The files are the carrier: both tools picked up the hand-edited v2 without any chat about it, which is the whole point of keeping the source as a file. And the rules are context, not enforcement: one run skipped the marker line, one answered at more length than the state tag asked. When that happens, sharpen the wording, do not conclude the method failed.
+
+Three things from the ChatGPT rows. The assistant follows your language from the second message, but the prompt's fixed phrases stay in the language of the block you pasted. Both runs gave eight rules where the prompt asks for five to seven: the correction became a rule of its own. And in both runs the assistant answered the refinement with more questions, and the script's next message was "accepted", so the rules were accepted before a final text was on screen. If that happens to you, ask to see the final text before you accept.
 
 Global files on the test machine (`~/.codex/AGENTS.md`, `~/.codex/config.toml`, `~/.claude/settings.json`, the user `CLAUDE.md`) were hashed before and after the runs and did not change. The public checkout of this repository stayed clean. One caveat on fidelity: the machine's own global `~/.codex/AGENTS.md` was in Codex's context during these runs (Codex always reads it), so a first-time user's Codex sees slightly less than these runs did.
