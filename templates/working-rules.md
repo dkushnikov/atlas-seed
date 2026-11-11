@@ -10,7 +10,7 @@ sources:
 
 This file is the **source**. The short form at the bottom is derived from it. When a rule changes: edit the rule here, raise the version in the frontmatter and in the short form, regenerate the short form ([prompts/continue.md](../prompts/continue.md)), paste it where your environment reads it ([environments.md](../environments.md)).
 
-Keep this file where you can find it: a note in Obsidian, a folder you open with Codex or Claude Code, a private Gist. ChatGPT does not keep it for you unless you upload it to a Project.
+Keep this file where you can find it: a note in Obsidian, a folder you open with Codex or Claude Code, a private repository. ChatGPT does not keep it for you unless you upload it to a Project.
 
 ## Context
 

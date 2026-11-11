@@ -16,13 +16,13 @@ Nothing below promises that a rule is always followed. Instruction files are con
 | Read by itself at the start of a chat | Custom instructions; a Project's instructions and files, inside that Project | `~/.codex/AGENTS.md`, then `AGENTS.md` from the project root down to the working directory, 32 KiB in total by default | `~/.claude/CLAUDE.md`, every `CLAUDE.md` from the working directory upward, `.claude/rules/`, files they import with `@path` |
 | Read when you ask | Text you paste; files you upload | Any file in the folder you name | Any file you name; outside the folder it asks first |
 | Its own memory | ChatGPT memory (Settings → Personalization) | Codex memories, local, off by default | Auto memory in `~/.claude/projects/<project>/memory/` |
-| Does not read | Your disk, Git, GitHub, a link you paste | Custom instructions, `CLAUDE.md`, `.claude/rules/`, Claude's memory (unless you configure a fallback) | `~/.codex/AGENTS.md`, Codex memories, custom instructions |
+| Does not read | Your disk, Git, GitHub, a link you paste | Custom instructions, `.claude/rules/`, Claude's memory; `CLAUDE.md` too, unless you configure a fallback and the folder has no `AGENTS.md` | `~/.codex/AGENTS.md`, Codex memories, custom instructions |
 
 Sources checked 2026-11-10: [ChatGPT custom instructions](https://help.openai.com/en/articles/8096356-chatgpt-custom-instructions), [Codex: Custom instructions with AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md), [Codex: Memories](https://learn.chatgpt.com/docs/customization/memories), [Claude Code: How Claude remembers your project](https://code.claude.com/docs/en/memory).
 
 ## ChatGPT
 
-**Save.** The Markdown document is yours to keep: a note in Obsidian, Apple Notes, a private Gist, a file in a folder. ChatGPT does not keep files for you outside Projects.
+**Save.** The Markdown document is yours to keep: a note in Obsidian, Apple Notes, a private repository, a file in a folder. ChatGPT does not keep files for you outside Projects.
 
 **Connect in the next chat.** Three ways; pick by scope.
 
@@ -30,17 +30,17 @@ Sources checked 2026-11-10: [ChatGPT custom instructions](https://help.openai.co
 - *One project:* create a Project, paste the short form into the project's instructions, upload the document as a project file. The rules apply only to chats inside that Project. Use this when the rules are for one piece of work, so they do not leak into every chat.
 - *This chat only:* paste the document at the start of the chat ([prompts/continue.md](prompts/continue.md)). Works in a Temporary chat too.
 
-**Update.** Edit the source document, raise the version, ask the assistant to regenerate the short form ([prompts/continue.md](prompts/continue.md)), paste it over the old one. The "(rules vN)" tail in the field shows which version is live.
+**Update.** Edit the source document, raise the version, ask the assistant to regenerate the short form ([prompts/continue.md](prompts/continue.md)), paste it over the old one. The "(rules vN)" tail shows which version of the short form is in the field. In a Project, also delete the uploaded document and upload the new version: a Project file does not update itself, and the tail in the field says nothing about it.
 
 **Memory.** ChatGPT may remember things you said. Treat it as a supplement: it can forget, and you cannot read it as a file. Custom instructions are the carrier you control.
 
-**Verified here:** not run in the ChatGPT product by the author (the only account at hand was a personal one; a run there would have mixed in its own memory and settings). The help-center facts above were checked on 2026-11-10; the prompt itself was run in Codex and Claude Code, see the table at the end. The 15-minute run in ChatGPT is the one check left for a first-time user.
+**Verified here:** not run in the ChatGPT product by the author (the only account at hand was a personal one; a run there would have mixed in its own memory and settings). The help-center facts above were checked on 2026-11-10; the start prompt was run in Codex CLI, and Claude Code reused the resulting rules in new sessions; see the table at the end. The 15-minute run in ChatGPT is the one check left for a first-time user.
 
 ## Codex
 
 **Save.** In a folder of yours, for example `~/ai/`: `working-rules.md` and `AGENTS.md` from [templates/](templates/). `identity/` appears after the full route. Codex writes the files when you ask it in that folder; the default permission mode asks before anything outside the folder.
 
-**Connect in the next chat.** Start Codex in that folder (`codex` from the folder, or open the folder in the app). It reads `AGENTS.md` at the start of every run and the file tells it to read `working-rules.md`. The first line of the answer should be `rules vN loaded`; if it is not, the file was not read.
+**Connect in the next chat.** Start Codex in that folder (`codex` from the folder, or open the folder in the app). It reads `AGENTS.md` at the start of every run and the file tells it to read `working-rules.md`. The first line of the answer should be `rules vN loaded`. If the line is missing, loading is not confirmed: ask which version of the rules it loaded before you rely on them. One of the author's runs followed the rules and did not print the line.
 
 For another project: add one line to that project's `AGENTS.md` (`Read ~/ai/working-rules.md before starting and follow it`). For every project: paste the short form into `~/.codex/AGENTS.md`. The second is your choice, not a default.
 
@@ -48,7 +48,7 @@ For another project: add one line to that project's `AGENTS.md` (`Read ~/ai/work
 
 **Memory.** Codex memories are off by default, local, and generated from past chats. A supplement; the file wins when they disagree.
 
-**Does not.** Codex does not read `CLAUDE.md` or `.claude/rules/` unless you add `project_doc_fallback_filenames = ["CLAUDE.md"]` to your `~/.codex/config.toml`. It does not read Claude's memory or ChatGPT custom instructions. Codex in the browser (cloud tasks) runs in its own container and is not covered here.
+**Does not.** Codex does not read `CLAUDE.md` or `.claude/rules/`. A fallback (`project_doc_fallback_filenames = ["CLAUDE.md"]` in your `~/.codex/config.toml`) makes it read `CLAUDE.md` only in a folder that has no `AGENTS.md`. No setting makes it read `.claude/rules/`. It does not read Claude's memory or ChatGPT custom instructions. Codex in the browser (cloud tasks) runs in its own container and is not covered here.
 
 **Verified here:** Codex CLI 0.166.0 on macOS, see the table at the end. The desktop app and the IDE extension read the same `AGENTS.md`; they were not exercised by the author.
 
@@ -75,7 +75,7 @@ One `AGENTS.md` with the content, one `CLAUDE.md` with `@AGENTS.md`. Never two c
 If the folder already has a `CLAUDE.md` with content, do not overwrite it. Two honest options:
 
 1. Move the content into `AGENTS.md` and leave `@AGENTS.md` in `CLAUDE.md`. Ask the agent to show the diff before it writes.
-2. Keep `CLAUDE.md` as is and tell Codex to read it: `project_doc_fallback_filenames = ["CLAUDE.md"]` in `~/.codex/config.toml`. This is your global Codex config; edit it by hand.
+2. Keep `CLAUDE.md` as is and tell Codex to read it: `project_doc_fallback_filenames = ["CLAUDE.md"]` in `~/.codex/config.toml`. This is your global Codex config; edit it by hand. It works only while the folder has no `AGENTS.md`: where both files exist, Codex reads `AGENTS.md` and skips `CLAUDE.md`. Rules kept in `.claude/rules/` stay invisible to Codex either way.
 
 If the folder already has an `AGENTS.md`, add the pointer to `working-rules.md` to it; do not replace it.
 

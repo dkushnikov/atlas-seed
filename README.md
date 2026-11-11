@@ -16,7 +16,7 @@
 
 Afterwards you have a text that turns "I value directness" into "state a significant objection before the answer", one correction already folded in, and a place the next chat reads it from. You do not have a description of yourself, a personality profile, or a system that updates itself. The rules grow by hand: each correction is one line you add.
 
-Fifteen minutes is the target, not a measurement. The author ran the prompt non-interactively in Codex and Claude Code on 2026-11-10 with a fictional persona ([environments.md § Verified runs](environments.md#verified-runs)); the ChatGPT product itself and a first-time user's timing are not recorded yet. If you run it, time it and open an issue with the number.
+Fifteen minutes is the target, not a measurement. The author ran the prompt non-interactively in Codex CLI on 2026-11-10 with a fictional persona, and Claude Code then reused the resulting rules in new sessions ([environments.md § Verified runs](environments.md#verified-runs)); the ChatGPT product itself and a first-time user's timing are not recorded yet. If you run it, time it and open an issue with the number.
 
 ## Choose your environment
 
@@ -90,7 +90,7 @@ Order does not matter. Rules first, vault later, or the other way round.
 
 ## Current state (2026-11-10)
 
-- **Short route:** prompt, templates and environment guide written; runs with a fictional persona in Codex CLI 0.166.0 and Claude Code 2.1.319 recorded in [environments.md](environments.md#verified-runs), including a hand edit of the rules picked up by both tools; the ChatGPT product path described from the help center, not run there, not yet timed by a first-time user.
+- **Short route:** prompt, templates and environment guide written; runs with a fictional persona recorded in [environments.md](environments.md#verified-runs): the start prompt in Codex CLI 0.166.0, the resulting rules reused in Claude Code 2.1.319, and a hand edit of the rules picked up by both tools; the ChatGPT product path described from the help center, not run there, not yet timed by a first-time user.
 - **Identity schema:** eight files, in use by the author since 2026-03.
 - **Full interview:** documented; tested by the author only.
 - **Loading mechanism:** documented per environment; hierarchical loading is optional, not a requirement.
