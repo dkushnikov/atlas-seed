@@ -56,7 +56,7 @@ For another project: add one line to that project's `AGENTS.md` (`Read ~/ai/work
 
 **Save.** Same folder, same files. `CLAUDE.md` holds one line, `@AGENTS.md`, so Claude Code and Codex read one file. Claude Code also reads an `AGENTS.md` on its own when there is no `CLAUDE.md` in the folder or above it (v2.1.277+); the import makes that unconditional.
 
-**Connect in the next chat.** Run `claude` in the folder. `CLAUDE.md` and its import load at launch; `/context all` lists them under Memory files. The first line of the answer should be `rules vN loaded`. If the line is missing, loading is not confirmed: check the list in `/context all`.
+**Connect in the next chat.** Run `claude` in the folder. `CLAUDE.md` and its import load at launch; `/context all` lists them under Memory files. The first line of the answer should be `rules vN loaded`. If the line is missing, loading is not confirmed. `/context all` shows whether `CLAUDE.md` and `AGENTS.md` loaded. It does not show `working-rules.md`, which the agent opens on the pointer: ask which version of the rules it loaded.
 
 For another project: `@~/ai/working-rules.md` in that project's `CLAUDE.md`. For every project: the same import in `~/.claude/CLAUDE.md`. Your choice.
 
