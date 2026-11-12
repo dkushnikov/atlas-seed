@@ -22,7 +22,7 @@ Here is my working-rules document, version <N>. One rule changed since the last 
 <paste the whole working-rules document here>
 ```
 
-Then paste the result into the field your environment reads ([environments.md](../environments.md)) and replace the old version there. If the field now shows "(rules v<N>)", the two match.
+Then paste the result into the field your environment reads ([environments.md](../environments.md)) and replace the old version there. If the field now shows "(rules v<N>)", the field and the document match. In a ChatGPT Project, also replace the uploaded document with the new version: the tail in the field does not cover the file.
 
 ## Re-running the full route
 

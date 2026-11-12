@@ -387,7 +387,7 @@ The schema is versioned. This is v0.1 alpha.
 
 ## Schema validation
 
-**v0.1 alpha has no validation tooling.** You write files, you read them, the assistant reads them. If they're malformed, you notice at the next session when the assistant's behaviour is off. The one observable check is the marker line the template `AGENTS.md` asks for (`rules vN loaded`): it tells you the instruction file was read, nothing more.
+**v0.1 alpha has no validation tooling.** You write files, you read them, the assistant reads them. If they're malformed, you notice at the next session when the assistant's behaviour is off. The one observable check is the marker line the template `AGENTS.md` asks for (`rules vN loaded`): when it appears, it tells you the instruction file was read, nothing more. When it is missing, loading is not confirmed.
 
 **v0.2+ planned:** a lightweight validator — a script that reads your identity files, checks frontmatter schema, confirms section headers are present, flags stale `updated` dates, and reports issues. Not enforcement, advisory.
 

@@ -29,7 +29,7 @@ What Atlas Seed can rely on, and what it cannot:
 
 - **The instruction file loads at the start.** `AGENTS.md` in Codex, `CLAUDE.md` with its `@imports` in Claude Code, custom instructions in ChatGPT. This is mechanical.
 - **Files the instruction file names load when the agent opens them.** "Read `working-rules.md` first" is honoured by the model, not by the tool. It is reliable in practice and not guaranteed. In Claude Code an `@working-rules.md` import is mechanical; in Codex there is no import, so the pointer is the mechanism.
-- **A marker makes loading observable.** The template `AGENTS.md` asks for one line at the start of the first answer, `rules vN loaded`. No line, no load.
+- **A marker makes loading observable.** The template `AGENTS.md` asks for one line at the start of the first answer, `rules vN loaded`. The line is a signal, not proof. If it is missing, loading is not confirmed: ask the agent which version it loaded. A run can follow the rules without printing the line ([environments.md § Verified runs](environments.md#verified-runs)).
 - **Nothing is loaded in full by default except what you put at the global or scope level.** The identity files are referenced, not inlined: `me-summary.md` is the one worth naming at the top; the rest the agent reads when the work needs depth. This keeps the start of a session cheap.
 - **A link loads nothing.** A URL in a chat is text.
 
@@ -92,7 +92,7 @@ The identity files and the working rules are flat Markdown with YAML frontmatter
 2. Name the instruction surface and what it loads at the start.
 3. Choose the stable path for the files and write it into the instruction surface.
 4. Put the `rules vN loaded` marker in and check it appears.
-5. Test the boundary you care about: start a session where the rules should not apply and confirm the marker is absent.
+5. Test the boundary you care about: start a session where the rules should not apply and ask the agent which instruction files and rules it loaded. A missing marker alone does not show that the rules were not read.
 6. Write the result up as a section of [environments.md](environments.md) and open a pull request.
 
 ## Future work
